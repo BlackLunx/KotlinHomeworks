@@ -1,18 +1,20 @@
 package matrix
 
+import complex.Complex
+
 
 class Matrix {
-    private lateinit var matrix: Array<IntArray>
+    private lateinit var matrix: Array<Array<Complex>>
     private var n = 0
     private var m = 0
 
     constructor(n: Int, m: Int) {
         this.n = n
         this.m = m
-        matrix = Array(n) { IntArray(m) }
+        matrix = Array(n) { Array(m) {Complex(0.0,0.0 )} }
     }
 
-    constructor(buf: Array<IntArray>) {
+    constructor(buf:  Array<Array<Complex>>) {
         copyArr(buf)
     }
 
@@ -24,7 +26,7 @@ class Matrix {
         if (mtx.n != n || mtx.m != m) throw Exception()
         for (i in 0 until n) {
             for (j in 0 until m) {
-                matrix[i][j] += mtx.matrix[i][j] * del
+                matrix[i][j] = matrix[i][j].Add( mtx.matrix[i][j].Invert(del))
             }
         }
     }
@@ -39,28 +41,28 @@ class Matrix {
 
     fun mul(mtx: Matrix) {
         if (m != mtx.n) throw Exception()
-        val buf = Array(n) { IntArray(mtx.m) }
+        val buf = Array(n) { Array(mtx.m) {Complex(0.0,0.0 )} }
         for (i in 0 until n) {
             for (j in 0 until mtx.m) {
                 for (k in 0 until m) {
-                    buf[i][j] += matrix[i][k] * mtx.matrix[k][j]
+                    buf[i][j] = buf[i][j].Add(matrix[i][k].Mul(mtx.matrix[k][j]))
                 }
             }
         }
         copyArr(buf)
     }
 
-    private fun copyArr(buf: Array<IntArray>) {
+    private fun copyArr(buf:  Array<Array<Complex>>) {
         n = buf.size
         m = buf[0].size
-        matrix = Array(n) { IntArray(m) }
+        matrix = Array(n) { Array(m) {Complex(0.0,0.0 )} }
         for (i in 0 until n) {
             if (m >= 0) System.arraycopy(buf[i], 0, matrix[i], 0, m)
         }
     }
 
     fun trans() {
-        val buf = Array(m) { IntArray(n) }
+        val buf = Array(m) { Array(n) {Complex(0.0,0.0 )} }
         for (i in 0 until n) {
             for (j in 0 until m) {
                 buf[j][i] = matrix[i][j]
